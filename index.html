@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>抽签系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,15 +13,15 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
-
+        
         body {
             background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
-            color: #fff;
+            color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
-
+        
         .tech-bg {
             position: fixed;
             top: 0;
@@ -30,14 +31,22 @@
             z-index: -1;
             overflow: hidden;
         }
-
+        
         .grid-line {
             position: absolute;
             background: rgba(0, 247, 255, 0.05);
         }
-        .grid-line.horizontal { width: 100%; height: 1px; }
-        .grid-line.vertical { width: 1px; height: 100%; }
-
+        
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+        }
+        
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+        }
+        
         .glowing-dots {
             position: absolute;
             width: 3px;
@@ -47,11 +56,12 @@
             box-shadow: 0 0 10px 2px #00f7ff;
             animation: pulse 3s infinite alternate;
         }
+        
         @keyframes pulse {
             0% { opacity: 0.3; }
             100% { opacity: 0.8; }
         }
-
+        
         header {
             text-align: center;
             padding: 25px 20px;
@@ -61,6 +71,7 @@
             position: relative;
             overflow: hidden;
         }
+        
         header::before {
             content: '';
             position: absolute;
@@ -71,10 +82,12 @@
             background: linear-gradient(90deg, transparent, #00f7ff, transparent);
             animation: headerGlow 3s infinite;
         }
+        
         @keyframes headerGlow {
             0% { left: -100%; }
             100% { left: 100%; }
         }
+        
         h1 {
             font-size: 42px;
             font-weight: 700;
@@ -86,41 +99,46 @@
             letter-spacing: 2px;
             margin-bottom: 10px;
         }
+        
         .subtitle {
             color: #a0d2ff;
             font-size: 16px;
             letter-spacing: 1px;
         }
-
-
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 30px 20px;
         }
-
-
+        
         .control-panel {
             background: rgba(0, 30, 60, 0.7);
             border-radius: 15px;
             padding: 25px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             border: 1px solid rgba(0, 150, 255, 0.3);
             box-shadow: 0 5px 20px rgba(0, 20, 60, 0.5);
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
         }
-
+        
         .control-group {
             background: rgba(0, 40, 80, 0.5);
             padding: 20px;
             border-radius: 10px;
             border-left: 4px solid;
         }
-        .control-group.list1 { border-left-color: #00f7ff; }
-        .control-group.list2 { border-left-color: #66ccff; }
-
+        
+        .control-group.list1 {
+            border-left-color: #00f7ff;
+        }
+        
+        .control-group.list2 {
+            border-left-color: #66ccff;
+        }
+        
         .control-title {
             font-size: 20px;
             margin-bottom: 15px;
@@ -128,16 +146,26 @@
             align-items: center;
             gap: 10px;
         }
-        .list1 .control-title { color: #00f7ff; }
-        .list2 .control-title { color: #66ccff; }
-
-        .control-item { margin-bottom: 15px; }
+        
+        .list1 .control-title {
+            color: #00f7ff;
+        }
+        
+        .list2 .control-title {
+            color: #66ccff;
+        }
+        
+        .control-item {
+            margin-bottom: 15px;
+        }
+        
         label {
             display: block;
             margin-bottom: 8px;
             color: #b0d0ff;
             font-weight: 500;
         }
+        
         select {
             width: 100%;
             padding: 12px 15px;
@@ -149,43 +177,45 @@
             outline: none;
             transition: all 0.3s;
         }
+        
         select:focus {
             border-color: #00f7ff;
             box-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
         }
-        .blue-select { color: #66ccff; font-weight: 500; }
-
-
-        .tail-filter-row {
-            background: rgba(0, 50, 100, 0.7);
-            border-radius: 12px;
-            padding: 20px 25px;
-            margin: 0 0 25px 0;
-            border: 1px solid rgba(0, 200, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 25px;
+        
+        .blue-select {
+            color: #66ccff;
+            font-weight: 500;
         }
-        .tail-filter-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        
+        .tail-number-section {
+            background: rgba(0, 30, 60, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 20, 60, 0.5);
+        }
+        
+        .tail-number-title {
             font-size: 20px;
-            color: #b0f0ff;
-            text-shadow: 0 0 8px #00f7ff;
+            color: #a0d2ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .tail-filter-label i { font-size: 24px; color: #00f7ff; }
+        
         .tail-number-selector {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            flex: 1;
+            gap: 8px;
+            margin-top: 10px;
         }
+        
         .tail-number {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -193,38 +223,35 @@
             border-radius: 50%;
             cursor: pointer;
             font-weight: 600;
-            font-size: 18px;
-            transition: all 0.2s;
+            transition: all 0.3s;
             border: 2px solid transparent;
-            color: #cceeff;
         }
+        
         .tail-number:hover {
-            background: rgba(0, 150, 255, 0.6);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 200, 255, 0.4);
+            background: rgba(0, 150, 255, 0.5);
+            transform: translateY(-2px);
         }
+        
         .tail-number.selected {
             background: #00f7ff;
             color: #003366;
             border-color: #00f7ff;
-            box-shadow: 0 0 15px #00f7ff;
-            font-weight: 700;
+            box-shadow: 0 0 10px #00f7ff;
         }
-        .tail-filter-info {
-            color: #88ddff;
-            padding: 6px 15px;
-            background: rgba(0, 80, 160, 0.5);
-            border-radius: 20px;
-            font-size: 15px;
-            border-left: 3px solid #00f7ff;
+        
+        .tail-note {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #a0d2ff;
         }
-
+        
         .button-panel {
             display: flex;
             justify-content: center;
             gap: 25px;
             margin: 30px 0;
         }
+        
         .btn {
             padding: 15px 35px;
             border-radius: 10px;
@@ -239,14 +266,41 @@
             letter-spacing: 1px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        .btn i { font-size: 20px; }
-        .btn-start { background: linear-gradient(135deg, #0066ff, #00ccff); color: white; }
-        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4); }
-        .btn-stop { background: linear-gradient(135deg, #ff3333, #ff6666); color: white; }
-        .btn-stop:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 51, 51, 0.4); }
-        .btn-reset { background: linear-gradient(135deg, #9933ff, #cc66ff); color: white; }
-        .btn-reset:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(153, 51, 255, 0.4); }
-
+        
+        .btn i {
+            font-size: 20px;
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #0066ff, #00ccff);
+            color: white;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(135deg, #ff3333, #ff6666);
+            color: white;
+        }
+        
+        .btn-stop:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 51, 51, 0.4);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #9933ff, #cc66ff);
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(153, 51, 255, 0.4);
+        }
+        
         .rolling-display {
             background: rgba(0, 20, 40, 0.8);
             border-radius: 15px;
@@ -258,6 +312,7 @@
             display: flex;
             flex-direction: column;
         }
+        
         .rolling-title {
             font-size: 22px;
             color: #a0d2ff;
@@ -268,6 +323,7 @@
             justify-content: center;
             gap: 10px;
         }
+        
         .rolling-area {
             flex-grow: 1;
             display: grid;
@@ -276,6 +332,7 @@
             align-items: center;
             justify-items: center;
         }
+        
         .name-slot {
             width: 100%;
             height: 60px;
@@ -290,26 +347,34 @@
             position: relative;
             border: 1px solid rgba(0, 150, 255, 0.2);
         }
+        
         .name-slot.rolling {
             background: rgba(0, 60, 120, 0.7);
             border-color: rgba(0, 247, 255, 0.5);
             box-shadow: 0 0 10px rgba(0, 247, 255, 0.3);
         }
-        .name-slot.list1 { color: #00f7ff; }
-        .name-slot.list2 { color: #66ccff; }
+        
+        .name-slot.list1 {
+            color: #00f7ff;
+        }
+        
+        .name-slot.list2 {
+            color: #66ccff;
+        }
+        
         .name-slot.special {
             color: #ff9900;
             border-color: rgba(255, 153, 0, 0.5);
             background: rgba(255, 153, 0, 0.1);
         }
-
-        /* ----- 结果显示区域 ----- */
+        
         .result-display {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
+        
         .result-panel {
             background: rgba(0, 30, 60, 0.7);
             border-radius: 15px;
@@ -317,14 +382,24 @@
             border: 1px solid rgba(0, 150, 255, 0.3);
             box-shadow: 0 5px 20px rgba(0, 20, 60, 0.5);
         }
+        
         .result-title {
             font-size: 24px;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid;
         }
-        .result-title.list1 { color: #00f7ff; border-bottom-color: #00f7ff; }
-        .result-title.list2 { color: #66ccff; border-bottom-color: #66ccff; }
+        
+        .result-title.list1 {
+            color: #00f7ff;
+            border-bottom-color: #00f7ff;
+        }
+        
+        .result-title.list2 {
+            color: #66ccff;
+            border-bottom-color: #66ccff;
+        }
+        
         .result-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -333,9 +408,21 @@
             overflow-y: auto;
             padding-right: 10px;
         }
-        .result-list::-webkit-scrollbar { width: 8px; }
-        .result-list::-webkit-scrollbar-track { background: rgba(0, 40, 80, 0.5); border-radius: 4px; }
-        .result-list::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 4px; }
+        
+        .result-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .result-list::-webkit-scrollbar-track {
+            background: rgba(0, 40, 80, 0.5);
+            border-radius: 4px;
+        }
+        
+        .result-list::-webkit-scrollbar-thumb {
+            background: #00aaff;
+            border-radius: 4px;
+        }
+        
         .result-item {
             padding: 12px 10px;
             text-align: center;
@@ -345,25 +432,38 @@
             transition: all 0.3s;
             border: 1px solid transparent;
         }
-        .result-item:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0, 100, 200, 0.2); }
-        .result-item.list1 { color: #00f7ff; }
-        .result-item.list2 { color: #66ccff; }
+        
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 100, 200, 0.2);
+        }
+        
+        .result-item.list1 {
+            color: #00f7ff;
+        }
+        
+        .result-item.list2 {
+            color: #66ccff;
+        }
+        
         .result-item.special {
             color: #ff9900;
             border-color: rgba(255, 153, 0, 0.5);
             background: rgba(255, 153, 0, 0.1);
         }
+        
         .result-item.high-prob {
             border-color: rgba(0, 247, 255, 0.5);
             background: rgba(0, 247, 255, 0.1);
         }
-
+        
         .status-indicator {
             display: flex;
             justify-content: center;
             gap: 30px;
             margin-top: 25px;
         }
+        
         .status-item {
             display: flex;
             align-items: center;
@@ -373,39 +473,151 @@
             border-radius: 20px;
             background: rgba(0, 40, 80, 0.5);
         }
+        
         .status-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
         }
-        .status-dot.active { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
-        .status-dot.inactive { background-color: #666; }
-
+        
+        .status-dot.active {
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .status-dot.inactive {
+            background-color: #666;
+        }
+        
+        .group-info {
+            background: rgba(0, 40, 80, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #ff9900;
+        }
+        
+        .group-info-title {
+            color: #ff9900;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .group-info-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .info-item {
+            padding: 8px;
+            background: rgba(0, 60, 120, 0.3);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .process-info {
+            background: rgba(0, 40, 80, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #66ccff;
+        }
+        
+        .process-title {
+            color: #66ccff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .process-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(0, 60, 120, 0.3);
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #00aaff;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+        }
         
         @media (max-width: 1100px) {
-            .result-display { grid-template-columns: 1fr; }
+            .result-display {
+                grid-template-columns: 1fr;
+            }
         }
+        
         @media (max-width: 768px) {
-            .control-panel { grid-template-columns: 1fr; }
-            .button-panel { flex-direction: column; align-items: center; }
-            .btn { width: 100%; max-width: 300px; justify-content: center; }
-            .result-display { grid-template-columns: 1fr; }
-            h1 { font-size: 32px; }
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .result-display {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+        }
+        
+        @keyframes glow {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .glowing {
+            animation: glow 1s infinite alternate;
         }
     </style>
 </head>
 <body>
     <div class="tech-bg" id="techBg"></div>
-
+    
     <header>
         <h1><i class="fas fa-random"></i> 抽签系统</h1>
-        <p class="subtitle">随机抽取 | 双名单独立抽取</p>
+        <p class="subtitle">随机抽签 | 双名单独立抽取</p>
     </header>
-
+    
     <div class="container">
         <div class="control-panel">
             <div class="control-group list1">
-                <div class="control-title"><i class="fas fa-list-ol"></i> 名单一设置</div>
+                <div class="control-title">
+                    <i class="fas fa-list-ol"></i> 名单一设置
+                </div>
                 <div class="control-item">
                     <label>抽取人数：</label>
                     <select id="list1Count" class="blue-select">
@@ -415,8 +627,11 @@
                 <div class="control-item">
                 </div>
             </div>
+            
             <div class="control-group list2">
-                <div class="control-title"><i class="fas fa-list-alt"></i> 名单二设置</div>
+                <div class="control-title">
+                    <i class="fas fa-list-alt"></i> 名单二设置
+                </div>
                 <div class="control-item">
                     <label>抽取人数：</label>
                     <select id="list2Count" class="blue-select">
@@ -427,113 +642,978 @@
                 </div>
             </div>
         </div>
-
-
-        <div class="tail-filter-row">
-            <div class="tail-filter-label">
+        
+        <div class="tail-number-section">
+            <div class="tail-number-title">
                 <i class="fas fa-filter"></i> 尾号筛选
             </div>
             <div class="tail-number-selector" id="tailNumberSelector">
             </div>
+        </div>
+                
+        <div class="button-panel">
+            <button class="btn btn-start" id="startBtn">
+                <i class="fas fa-play"></i> 开始抽签
+            </button>
+            <button class="btn btn-stop" id="stopBtn" disabled>
+                <i class="fas fa-stop"></i> 停止
+            </button>
+            <button class="btn btn-reset" id="resetBtn">
+                <i class="fas fa-redo"></i> 重置
+            </button>
+        </div>
+        
+        <div class="rolling-display">
+            <div class="rolling-title">
+                <i class="fas fa-spinner fa-spin"></i> 滚动区域
+            </div>
+            <div class="rolling-area" id="rollingArea">
+                <div class="name-slot">准备开始抽签...</div>
             </div>
         </div>
-
-        <div class="button-panel">
-            <button class="btn btn-start" id="startBtn"><i class="fas fa-play"></i> 开始抽签</button>
-            <button class="btn btn-stop" id="stopBtn" disabled><i class="fas fa-stop"></i> 停止</button>
-            <button class="btn btn-reset" id="resetBtn"><i class="fas fa-redo"></i> 重置</button>
-        </div>
-
-        <div class="rolling-display">
-            <div class="rolling-title"><i class="fas fa-spinner fa-spin"></i> 名字滚动区域</div>
-            <div class="rolling-area" id="rollingArea"><div class="name-slot">准备开始抽签...</div></div>
-        </div>
-
+                
         <div class="result-display">
             <div class="result-panel">
-                <h2 class="result-title list1"><i class="fas fa-users"></i> 名单一抽中结果</h2>
-                <div class="result-list" id="list1Result"><div class="result-item list1">等待抽签结果...</div></div>
+                <h2 class="result-title list1">
+                    <i class="fas fa-users"></i> 名单一抽中结果
+                </h2>
+                <div class="result-list" id="list1Result">
+                    <div class="result-item list1">等待抽签结果...</div>
+                </div>
             </div>
+            
             <div class="result-panel">
-                <h2 class="result-title list2"><i class="fas fa-users"></i> 名单二抽中结果</h2>
-                <div class="result-list" id="list2Result"><div class="result-item list2">等待抽签结果...</div></div>
+                <h2 class="result-title list2">
+                    <i class="fas fa-users"></i> 名单二抽中结果
+                </h2>
+                <div class="result-list" id="list2Result">
+                    <div class="result-item list2">等待抽签结果...</div>
+                </div>
             </div>
         </div>
     </div>
-
+    
     <script>
-        const data = {
-            list1: [
-                "085777", "085406", "085760", "085381", "085535", "047749", "106620", "085212",
-                "105972", "046819", "085295", "106110", "106228", "047307", "048840", "085549", 
-                "085511", "047980", "046829", "047735", "047738", "047915", "047148", "106016", 
-                "047809", "085827", "047952", "106302", "085410", "085598", "106332", "049543", 
-                "047304", "047941", "049465", "049424", "048055", "047389", "106172", "106502", 
-                "085368", "047921", "047850", "118636", "047830", "047797", "047847", "048053", 
-                "085378", "047999", "085377", "048038", "106145", "048914", "048735", "085952", 
-                "106514", "047386", "049567", "085872", "085562", "085906", "106536", "047917", 
-                "106382", "085978", "085389", "047509", "085405", "047994", "046821", "047949", 
-                "106372", "046963", "085909", "085615", "105978", "085763", "085384", "085345", 
-                "085970", "106625", "048088", "106292", "047303", "047017", "047109", "047664", 
-                "085408", "106443", "085503", "085285", "047844", "048067", "047828", "105977", 
-                "085395", "047815", "085883", "048089", "047392", "047387", "085376", "047862", 
-                "106518", "049748", "085884", "085495", "047729", "046934", "106460", "105967", 
-                "085881", "085491", "048058", "049779", "106062", "046982", "047394", "047824", 
-                "106169", "106320", "047919", "106520", "085371", "047860", "085524", "085407", 
-                "106168", "047525", "047734", "047995", "048042", "085387", "106323", "085965", 
-                "106166", "085837", "046878", "085268", "047916", "106513", "047284", "085545", 
-                "047162", "106196", "047406", "085882", "106521", "085282", "085759", "106107", 
-                "085538", "085976", "085966", "047446", "049471", "047481", "106526", "047841", 
-                "085640", "047842", "048045", "085840", "085539", "048077", "085528", "105970", 
-                "085374", "047978", "048022", "047736", "048035", "085409", "085596", "085411", 
-                "047163", "048046", "085490", "047569", "047032", "106584", "047398", "047834", 
-                "085856", "048041", "047968", "047715", "085977", "106031", "106603", "047399", 
-                "048066", "085576", "047956", "047894", "048028", "106226", "106173", "047936", 
-                "047313", "085382", "047803", "048027", "047953", "047801", "085397", "047863", 
-                "048084", "047832", "047730", "085564", "048076", "047383", "049757", "106099", 
-                "106546", "105975", "047913", "049719", "047909", "085205", "047918", "048054", 
-                "048083", "047783", "047737", "047957", "106682", "106011", "048073", "085623", 
-                "046906", "106045", "047396", "047401", "106582", "047845", "047021", "048072", 
-                "085953", "106604", "048086", "047151", "106056", "106111", "106694", "047397", 
-                "048904", "047836", "106515", "047942", "106259", "085392", "085829", "085380", 
-                "085899", "106037", "106003", "105971", "048871", "106167", "048934", "048169", 
-                "048173", "085542", "048727", "048172", "048823", "106318", "047170", "106053", 
-                "047835", "047167", "048229", "047893", "106295", "106516", "106171", "047166", 
-                "085964", "106291", "085325", "085963", "047926", "047975", "047929", "048887", 
-                "085544", "047868", "106505", "106602", "048158", "106501", "085496", "047432", 
-                "047932", "085498", "085291", "048869", "048943", "047912", "106624", "047914", 
-                "048386", "085532", "047645", "047631", "047911", "049553", "047384", "085802", 
-                "048848", "046827", "047152", "106130", "085761", "048060", "048081", "047854", 
-                "085527", "048064", "047958", "047961", "106322", "047031", "105958", "047169", 
-                "046872", "048275", "085536", "085757", "085400", "085982", "106328", "085580", 
-                "085548", "085541", "085565", "047618", "047656", "106523", "047450", "106094", 
-                "105950", "105957", "106030", "048250", "048959", "085271", "085508", "106647", 
-                "085823", "048741", "085930", "047112", "048212", "106035", "106466", "047164", 
-                "048040", "085379", "085699", "047679", "049548", "049316", "106106", "047695", 
-                "047826", "085981", "049765", "047725", "105976", "047674", "085525", "047891", 
-                "047985", "047486", "106059", "106580", "048815", "048012", "049387", "047526", 
-                "047145", "085885", "106155", "047849", "106019", "085451", "085531", "047663", 
-                "085636", "085561", "049130", "085394", "047837", "047798", "085529", "047583", 
-                "047739", "047899", "085956", "106008", "048935", "048960", "047990", "049268", 
-                "047820", "047731", "049556", "048017", "085902", "048909", "047910", "082889", 
-                "047385", "085547", "085521", "047732", "085611", "085900", "085897", "085974", 
-                "102455", "048048", "106146", "046814", "085969"
-            ],
-
-            list2: (function() {
-                const arr = [];
-                for (let i = 543000; i <= 543635; i++) {
-                    arr.push(i.toString());
-                }
-                return arr;
-            })(),
-
-            hGroup: [
-               "106003","085823", "105972","049268","047738", "106536", "106062", "047916"
-            ]
+        const list1NameMap = {
+            "085777": "欧阳腾飞",
+            "085406": "张其友",
+            "085760": "杨杰",
+            "085381": "刘兵",
+            "085535": "刘洋",
+            "047749": "曾伟",
+            "106620": "李虹宇",
+            "105972": "李春雷",
+            "046819": "谭泽林",
+            "085295": "胡桂华",
+            "106110": "汤波",
+            "106228": "李万秀",
+            "047307": "周涛",
+            "048840": "刘海洋",
+            "085549": "叶迎松",
+            "085511": "严辉",
+            "047980": "徐井泉",
+            "046829": "孙永晴",
+            "047735": "张颂谦",
+            "047738": "徐瑞鸿",
+            "047915": "杨怡",
+            "047148": "罗贵森",
+            "106016": "谢晓颖",
+            "047809": "吴臣鑫",
+            "085827": "李小娟",
+            "047952": "谢勇",
+            "106302": "文喆",
+            "085410": "周泽翔",
+            "085598": "成丽",
+            "106332": "伍艳凝",
+            "049543": "潘勇",
+            "047304": "刘玲",
+            "047941": "杨世泽",
+            "049465": "詹伟",
+            "049424": "牟超琼",
+            "048055": "唐宗文",
+            "047389": "欧晓怡",
+            "106172": "周超",
+            "106502": "雷東奇",
+            "085368": "张国锐",
+            "047921": "牟永春",
+            "047850": "赵频",
+            "118636": "王勇",
+            "047830": "陈厚君",
+            "047797": "王雨",
+            "047847": "毛坤云",
+            "048053": "邓勇",
+            "085378": "李沿町",
+            "047999": "郑堂勇",
+            "085377": "李星",
+            "048038": "董琪",
+            "106145": "徐旭",
+            "048914": "魏亚玲",
+            "048735": "胡杨",
+            "085952": "李术园",
+            "106514": "李春燕",
+            "047386": "贾丽娜",
+            "049567": "邹炜",
+            "085872": "罗翔",
+            "085562": "张冬梅",
+            "085906": "陶泳翰",
+            "106536": "邹梓炫",
+            "047917": "胡朝阳",
+            "106382": "王凯",
+            "085978": "罗仕鑫",
+            "085389": "彭芙蓉",
+            "047509": "李强",
+            "085405": "张雷",
+            "047994": "康忠华",
+            "046821": "林静宇",
+            "047949": "王玉林",
+            "106372": "刘林俞",
+            "046963": "刘瑞",
+            "085909": "杨程",
+            "085615": "石力",
+            "105978": "黄谷",
+            "085763": "李娟",
+            "085384": "刘松",
+            "085345": "王小毅",
+            "085970": "詹权",
+            "106625": "曹智侨",
+            "048088": "陈卓威",
+            "106292": "陈仕轩",
+            "047303": "周新异",
+            "047017": "张嘉宁",
+            "047109": "袁小凡",
+            "047664": "刘静",
+            "085408": "陈凯",
+            "106443": "柳杨",
+            "085503": "齐炜",
+            "085285": "王春远",
+            "047844": "匡仕景",
+            "048067": "郑茂",
+            "047828": "林恒",
+            "105977": "满方才",
+            "085395": "伍敬",
+            "085883": "张彦文",
+            "048089": "李孟壕",
+            "047392": "文源",
+            "047387": "李东金",
+            "085376": "李尚游",
+            "047862": "吴爽",
+            "047815": "邓益权",
+            "106518": "林彩霞",
+            "049748": "朱丹",
+            "085884": "杨森",
+            "085495": "胡力木",
+            "047729": "田华伟",
+            "046934": "伍俊达",
+            "106460": "唐勇",
+            "105967": "郭荣标",
+            "085881": "杨小民",
+            "085491": "黎坤",
+            "048058": "张云峰",
+            "049779": "唐海超",
+            "106062": "官鑫",
+            "046982": "李友",
+            "047394": "曹江林",
+            "047824": "吴娟",
+            "106169": "廖勇",
+            "106320": "钟亚辉",
+            "047919": "喻千希",
+            "106520": "范治伟",
+            "085371": "邓志成",
+            "047860": "蒋佳男",
+            "085524": "付洁毅",
+            "085407": "赵洺",
+            "106168": "叶行",
+            "047525": "刘义杰",
+            "047734": "张洪维",
+            "047995": "张明",
+            "048042": "彭什均",
+            "085387": "龙兴州",
+            "106323": "任定坤",
+            "085965": "刘川",
+            "106166": "刘志强",
+            "085837": "李硕林",
+            "046878": "邓林芝",
+            "085268": "黄大江",
+            "047916": "陈艾玲",
+            "106513": "李伟",
+            "047284": "杨伟",
+            "085545": "陶杰",
+            "047162": "倪俊",
+            "106196": "李雪",
+            "047406": "黄雄",
+            "085882": "韩力",
+            "106521": "燕强",
+            "085282": "潘丹",
+            "085759": "陈祖涛",
+            "106107": "张娅",
+            "085538": "罗鹏",
+            "085976": "曾楠",
+            "085966": "郝磊",
+            "047446": "苟洪军",
+            "049471": "徐文毅",
+            "047481": "胡伟",
+            "106526": "戚星辰",
+            "047841": "陈华",
+            "085640": "程强",
+            "047842": "串俊高",
+            "048045": "邓大洪",
+            "085840": "余钟",
+            "085539": "罗在展",
+            "048077": "廖新根",
+            "085528": "江河杉",
+            "105970": "郑露",
+            "085374": "李果",
+            "047978": "李险峰",
+            "048022": "杨天军",
+            "047736": "范杨",
+            "048035": "张俊",
+            "085409": "周建勇",
+            "085596": "张晓",
+            "085411": "王洪",
+            "047163": "杨春洪",
+            "048046": "刘锋",
+            "085490": "高梓腾",
+            "047569": "刘昌龙",
+            "047032": "史继东",
+            "106584": "钟洁",
+            "047398": "牟剑",
+            "047834": "龚定权",
+            "085856": "郝继生",
+            "048041": "陈朝聪",
+            "047968": "刘全洲",
+            "047715": "邓骥强",
+            "085977": "王遥",
+            "106031": "张宇镐",
+            "106603": "刘俊洪",
+            "047399": "高翼",
+            "048066": "陈国义",
+            "085576": "梁莉",
+            "047956": "肖秀枢",
+            "047894": "胡小力",
+            "048028": "李文万",
+            "106226": "陈自杰",
+            "106173": "宗飞",
+            "047936": "郑勇军",
+            "047313": "陈义学",
+            "085382": "刘大发",
+            "047803": "张方才",
+            "048027": "李拥军",
+            "047953": "杨永斌",
+            "047801": "杨平轩",
+            "085397": "肖俊尧",
+            "047863": "肖永权",
+            "048084": "朱明华",
+            "047832": "曾家敏",
+            "047730": "史明凤",
+            "085564": "张宇鑫",
+            "048076": "黄艳",
+            "047383": "唐永初",
+            "049757": "邓正好",
+            "106099": "贺雨",
+            "106546": "马蕾",
+            "105975": "陈鹏",
+            "047913": "李金鑫",
+            "049719": "刘亚军",
+            "047909": "李刚",
+            "085205": "黄志强",
+            "047918": "曾兴才",
+            "048054": "黄芝彬",
+            "048083": "胡国兴",
+            "047783": "李殿华",
+            "047737": "周鑫",
+            "047957": "黄强",
+            "106682": "钟浩",
+            "106011": "王德华",
+            "048073": "喻强",
+            "085623": "杨俊颖",
+            "046906": "王旺",
+            "106045": "陈帅",
+            "047396": "苟勇",
+            "047401": "张洁",
+            "106582": "唐胜强",
+            "047845": "罗德君",
+            "047021": "王德军",
+            "048072": "余晓辉",
+            "085953": "廖钦",
+            "106604": "刘强",
+            "048086": "张瑞",
+            "047151": "曹芸",
+            "106056": "李华",
+            "106111": "曹立",
+            "106694": "潘航",
+            "047397": "彭盛",
+            "085392": "余彰",
+            "048904": "连柯欣",
+            "047836": "刘一凡",
+            "106515": "刘义军",
+            "047942": "徐元杰",
+            "106259": "邹略芯",
+            "085829": "范旎",
+            "085380": "林川",
+            "085899": "葛腾",
+            "106037": "郑旺",
+            "106003": "周鑫",
+            "105971": "郭浪",
+            "048871": "桂杨",
+            "106167": "于世强",
+            "048934": "陈天亮",
+            "048169": "于文钦",
+            "048173": "周俊涛",
+            "085542": "牟麟",
+            "048727": "佘杰",
+            "048172": "王俊松",
+            "048823": "周诗易",
+            "106318": "陈芳华",
+            "047170": "方学春",
+            "047835": "罗嗣浩然",
+            "047167": "钟仕宏",
+            "106053": "刘强",
+            "106516": "李洪强",
+            "047893": "张芷璇",
+            "106171": "柴学平",
+            "106291": "胡小力",
+            "047929": "曾卓",
+            "047975": "周坤",
+            "047926": "童肖",
+            "085963": "沈杨",
+            "085964": "赖珂",
+            "047166": "刘玺川",
+            "106295": "肖杰",
+            "085325": "叶丹丹",
+            "047868": "何勇",
+            "106505": "郑逸",
+            "106602": "陈伊默",
+            "048158": "曹轩",
+            "106501": "余志文",
+            "085496": "李久立",
+            "047432": "朱宇",
+            "047932": "熊翼飞",
+            "085498": "梁波",
+            "085291": "谢颖鸿",
+            "048869": "方应豪",
+            "048943": "何卓桓",
+            "047912": "李亚宁",
+            "106624": "聂政权",
+            "047914": "林早考",
+            "048386": "骆毅",
+            "085532": "李沁遥",
+            "047645": "邱军",
+            "047631": "邹小军",
+            "047911": "刘艺韬",
+            "049553": "贾庆筠",
+            "047384": "刘强",
+            "085802": "马卢峰",
+            "048848": "邓敖",
+            "046827": "吴文豪",
+            "047152": "周雪乔",
+            "106130": "周建",
+            "085761": "颜福涛",
+            "048060": "毕国平",
+            "048081": "钟桦",
+            "047854": "舒刚",
+            "085527": "黄俊成",
+            "048064": "贺燕飞",
+            "047958": "彭东林",
+            "047961": "王克文",
+            "106322": "潘虹霖",
+            "047031": "尹虎",
+            "105958": "黄仕丽",
+            "047169": "解朝伟",
+            "046872": "胡凌逸",
+            "048275": "金潇",
+            "085536": "刘宇",
+            "085757": "唐旭",
+            "085400": "徐敏",
+            "085982": "万学敏",
+            "106328": "王延松",
+            "085580": "吴薇",
+            "085548": "杨可藩",
+            "085541": "莫伟",
+            "085565": "邹杰",
+            "047618": "饶卫东",
+            "047656": "曾令海",
+            "106523": "黄沁",
+            "047450": "熊家林",
+            "106094": "陈翰林",
+            "105950": "彭元",
+            "105957": "胥佳汛",
+            "106030": "雷青松",
+            "048250": "黄帝钢",
+            "048959": "李良晨",
+            "085271": "兰欢",
+            "085508": "林莎莎",
+            "106647": "王诚武",
+            "085823": "段国彪",
+            "048741": "李英",
+            "085930": "李子健",
+            "047112": "黄杰",
+            "048212": "李小兰",
+            "106035": "刘海贤",
+            "106466": "崔宇",
+            "047164": "肖忠涛",
+            "048040": "李玉标",
+            "085379": "梁礼超",
+            "085699": "肖雪冰",
+            "047679": "刘智能",
+            "049548": "韩科",
+            "049316": "惠云莉",
+            "106106": "张敏",
+            "047695": "胡斌",
+            "047826": "刘大联",
+            "085981": "孔凡于",
+            "049765": "彭南松",
+            "047725": "万越川",
+            "105976": "赵庆",
+            "047674": "肖相春",
+            "085525": "郭玲",
+            "047891": "幸卫东",
+            "047985": "李银",
+            "047486": "温永红",
+            "106059": "陈良语",
+            "106580": "龙帅",
+            "048815": "李江宁",
+            "048012": "孙浩然",
+            "049387": "李文婧",
+            "047526": "王耀民",
+            "047145": "毛一顺",
+            "048960": "梁昊",
+            "047990": "刘翔",
+            "085885": "谭志德",
+            "106155": "彭兢",
+            "047849": "李崇华",
+            "106019": "江健刚",
+            "085451": "黄黎",
+            "085531": "李惠",
+            "047663": "张家荣",
+            "085636": "张立",
+            "085561": "曾永成",
+            "049130": "谢秦",
+            "085394": "唐国强",
+            "047837": "吴立龙",
+            "047798": "董泽宇",
+            "085529": "解进蓉",
+            "047583": "陈波",
+            "047739": "詹天烨",
+            "047899": "万莉莉",
+            "085956": "赖永立",
+            "106008": "宗庆伟",
+            "048935": "李鑫袁",
+            "049268": "谢莉萍",
+            "047820": "文艺龙",
+            "047731": "刘洋",
+            "049556": "贾炜",
+            "048017": "曹燕",
+            "085902": "钟咏",
+            "048909": "袁永彬",
+            "047910": "伍维焕",
+            "082889": "耿子鉴",
+            "047385": "赵春林",
+            "085547": "肖宾",
+            "085521": "周育霖",
+            "047732": "李禧铠",
+            "085611": "马波",
+            "085900": "彭湃",
+            "085897": "罗亮",
+            "085974": "钟超",
+            "102455": "尹博",
+            "048048": "赖午晟",
+            "106146": "程四维",
+            "046814": "何坤昊",
+            "085969": "牟帆",
+            "085212": "王伟"
         };
 
-        const specialGroup = [
+        const list2NameMap = {
+            "543140": "贺倩",
+            "543554": "温泉",
+            "543301": "张珊",
+            "543465": "孙溢",
+            "543494": "何晓波",
+            "543159": "陈文武",
+            "543486": "王丽娟",
+            "543577": "唐雅芝",
+            "543138": "秦莉莎",
+            "543580": "祝文友",
+            "543511": "刘春秀",
+            "543552": "尹若伊",
+            "543437": "黄阳波",
+            "543174": "周琦",
+            "543099": "凌育奇",
+            "543466": "韩小莉",
+            "543136": "陈杰",
+            "543485": "李英",
+            "543315": "蒋溧",
+            "543022": "幸荣明",
+            "543599": "徐舟",
+            "543600": "陈乾",
+            "543143": "王厚涛",
+            "543163": "李强",
+            "543555": "串茂洁",
+            "543467": "赵玉娟",
+            "543056": "严冬",
+            "543134": "孙德宣",
+            "543109": "吕智慧",
+            "543127": "李丽娜",
+            "543162": "柳文英",
+            "543217": "周梦兰",
+            "543429": "周紫涵",
+            "543170": "伍代玲",
+            "543536": "何云秀",
+            "543221": "陈健为",
+            "543135": "李强",
+            "543448": "范松鑫",
+            "543181": "王泓翔",
+            "543493": "吴念强",
+            "543591": "谭旭东",
+            "543242": "于彪",
+            "543118": "苏小力",
+            "543404": "曾健",
+            "543484": "张膑心",
+            "543089": "黄小迁",
+            "543612": "苏湘",
+            "543184": "曾沿源",
+            "543247": "黄舒韵",
+            "543201": "程思琪",
+            "543049": "黄能",
+            "543203": "夏微",
+            "543008": "伍林",
+            "543126": "陈修其",
+            "543449": "王鸣剑",
+            "543305": "张洪宾",
+            "543009": "郑朝虎",
+            "543521": "李思静",
+            "543510": "余浩",
+            "543172": "周代超",
+            "543533": "冷朝洪",
+            "543260": "徐永家",
+            "543228": "赵桢",
+            "543277": "黄胜",
+            "543515": "唐永连",
+            "543376": "严世伟",
+            "543101": "古仁艺",
+            "543027": "毛国安",
+            "543218": "王生奎",
+            "543534": "任高涌",
+            "543539": "李建西",
+            "543011": "陈国林",
+            "543415": "杨婷",
+            "543568": "狄鑫宏",
+            "543576": "周义杰",
+            "543205": "徐小琴",
+            "543215": "蒲久涛",
+            "543339": "谢杰",
+            "543342": "胡林",
+            "543264": "韩艳",
+            "543146": "吴启彪",
+            "543402": "郭桐生",
+            "543265": "李明欣",
+            "543053": "肖建",
+            "543156": "魏霞",
+            "543068": "孙琳",
+            "543487": "李洪林",
+            "543190": "宋值欣",
+            "543192": "罗广成",
+            "543530": "甘国田",
+            "543544": "杨紫涵",
+            "543500": "何渊",
+            "543292": "周华才",
+            "543420": "王诗集",
+            "543475": "云科",
+            "543563": "陈凤洁",
+            "543460": "林波",
+            "543029": "邹光兵",
+            "543047": "章成久",
+            "543227": "唐川杭",
+            "543564": "单大满",
+            "543065": "钱信任",
+            "543472": "李丽文",
+            "543107": "聂祥",
+            "543115": "赵雷",
+            "543558": "陈鹏",
+            "543149": "王强",
+            "543171": "周雪",
+            "543442": "代成星",
+            "543516": "文杰",
+            "543406": "罗凯夫",
+            "543543": "华富阳",
+            "543252": "邹吉义",
+            "543267": "杨叶",
+            "543262": "甘代伟",
+            "543295": "黄晗虔",
+            "543508": "吴亚磊",
+            "543547": "郭昭金",
+            "543313": "刘耀徽",
+            "543394": "方源",
+            "543391": "许川",
+            "543436": "杨舒婷",
+            "543464": "柳永强",
+            "543419": "于金伟",
+            "543133": "陶宇",
+            "543416": "邓洪",
+            "543505": "廖永强",
+            "543557": "张进",
+            "543405": "曾理",
+            "543038": "周杨彬",
+            "543012": "朱宇均",
+            "543024": "成强立",
+            "543069": "江洋",
+            "543104": "赵维程",
+            "543479": "谢磊",
+            "543411": "宋军杰",
+            "543409": "凌海云",
+            "543048": "余远航",
+            "543583": "刘存鑫",
+            "543092": "眭洪宇",
+            "543045": "李宁",
+            "543401": "龚均丽",
+            "543063": "杨荣刚",
+            "543522": "袁新明",
+            "543013": "李元其",
+            "543004": "卢萍",
+            "543243": "陈秋蒙",
+            "543017": "江炆茂",
+            "543476": "雷波",
+            "543057": "雷莉",
+            "543502": "龚雨琪",
+            "543471": "夏雪犁",
+            "543079": "陶懿",
+            "543030": "何洪霞",
+            "543210": "王琴",
+            "543304": "万蓝琳",
+            "543474": "罗艳",
+            "543122": "李翠莲",
+            "543031": "杨泽芳",
+            "543457": "易雪婷",
+            "543204": "易芝灵",
+            "543250": "何洁",
+            "543468": "周凯",
+            "543497": "袁洋",
+            "543253": "黄姝琪",
+            "543039": "王强",
+            "543095": "龙蕾",
+            "543607": "代微",
+            "543054": "邓满春",
+            "543137": "兰翠",
+            "543232": "何伟",
+            "543157": "肖钰吉",
+            "543337": "侯廷森",
+            "543046": "洪茂钦",
+            "543524": "傅英格",
+            "543434": "谢仲富",
+            "543344": "邹海",
+            "543263": "刘定林",
+            "543106": "白永鹏",
+            "543322": "周天星",
+            "543458": "周瑞",
+            "543275": "黄健华",
+            "543412": "周国强",
+            "543169": "陈建",
+            "543417": "钟年杰",
+            "543129": "陈吉川",
+            "543529": "朱涛",
+            "543090": "莫舒帆",
+            "543098": "郑贵兵",
+            "543235": "付宇",
+            "543148": "张松",
+            "543347": "张强",
+            "543461": "李和友",
+            "543050": "罗利平",
+            "543273": "张兰飞",
+            "543562": "史书吉",
+            "543238": "袁源",
+            "543531": "方巧莹",
+            "543332": "余俊杰",
+            "543271": "李进",
+            "543042": "马代雄",
+            "543286": "丁健",
+            "543097": "杨燚",
+            "543206": "杨洋",
+            "543231": "李强",
+            "543186": "李磊",
+            "543269": "李俊",
+            "543335": "马富才",
+            "543478": "杨贵青",
+            "543294": "蒋万石",
+            "543350": "李涛",
+            "543270": "李秋廷",
+            "543239": "许鑫涵",
+            "543130": "许小康",
+            "543370": "周杰",
+            "543492": "叶小雨",
+            "543320": "谢强",
+            "543361": "李雨潇",
+            "543282": "邓学成",
+            "543578": "陈红旭",
+            "543385": "彭万权",
+            "543298": "李智",
+            "543348": "向代宇",
+            "543463": "夏利",
+            "543349": "卿祥伟",
+            "543431": "练厚锋",
+            "543212": "翁启轩",
+            "543360": "冯智",
+            "543341": "白兴源",
+            "543096": "马英强",
+            "543014": "万向军",
+            "543199": "吕智伟",
+            "543584": "欧先乾",
+            "543276": "刘圣",
+            "543155": "刘强",
+            "543560": "周兴",
+            "543281": "邱启波",
+            "543266": "曾映塔",
+            "543211": "罗益",
+            "543059": "张进",
+            "543455": "史世秋",
+            "543432": "李飞洋",
+            "543055": "何涛",
+            "543587": "王傑",
+            "543593": "李浩",
+            "543582": "李岷声",
+            "543596": "梁智豪",
+            "543597": "冯昌政",
+            "543603": "廖宏伟",
+            "543611": "卓琳",
+            "543602": "李孟泽",
+            "543609": "熊彬",
+            "543604": "刘润",
+            "543579": "陈俊杰",
+            "543005": "孙强",
+            "543167": "韩剑伟",
+            "543035": "左凯月",
+            "543425": "肖铁文",
+            "543450": "李思蕊",
+            "543571": "曹冰戈",
+            "543246": "刘卓",
+            "543462": "文科钱",
+            "543085": "范青",
+            "543477": "黄中",
+            "543408": "黄小玲",
+            "543302": "余晓娟",
+            "543559": "刘云萍",
+            "543421": "万俊辉",
+            "543535": "赵玻",
+            "543168": "丁亮",
+            "543428": "曾飞",
+            "543422": "陈弟",
+            "543447": "廖翰林",
+            "543087": "马双",
+            "543545": "陈鸿圆",
+            "543152": "刘洋",
+            "543499": "刘宗元",
+            "543061": "邹光才",
+            "543325": "郑小奕",
+            "543470": "李雪梅",
+            "543333": "杨鸿峻",
+            "543072": "周霞",
+            "543176": "李毅",
+            "543396": "李培春",
+            "543319": "李源科",
+            "543357": "付强",
+            "543392": "曾章杰",
+            "543407": "曾汶涛",
+            "543403": "林志伟",
+            "543438": "叶汉文",
+            "543379": "陈伟",
+            "543440": "刘林鑫",
+            "543207": "牟长洪",
+            "543523": "周科吉",
+            "543495": "黄伟",
+            "543123": "邓燕",
+            "543310": "詹梦丽",
+            "543124": "雷佳桥",
+            "543234": "袁维丰",
+            "543216": "李泽帆",
+            "543249": "董文铭",
+            "543352": "唐启书",
+            "543160": "李刚",
+            "543546": "李威",
+            "543078": "徐钦",
+            "543573": "陆忠文",
+            "543581": "吴韵涵",
+            "543532": "王永浩",
+            "543592": "胡书铭",
+            "543610": "张沆天",
+            "543209": "谢佳君",
+            "543229": "王莹莹",
+            "543378": "黄祚尧",
+            "543233": "陈声乾",
+            "543513": "黄建华",
+            "543399": "饶小强",
+            "543330": "李光伦",
+            "543509": "凌成航",
+            "543088": "欧鑫",
+            "543309": "刘东",
+            "543549": "尹伟力",
+            "543439": "王松",
+            "543261": "杨崇禄",
+            "543200": "陈友民",
+            "543226": "周绍文",
+            "543453": "刘元",
+            "543553": "叶佳伟",
+            "543338": "闵锐",
+            "543165": "向怀",
+            "543026": "杨林",
+            "543514": "付强",
+            "543445": "李宜航",
+            "543314": "胡永兵",
+            "543023": "雷洁",
+            "543272": "杨玉林",
+            "543443": "杨冬",
+            "543520": "张晋军",
+            "543491": "何关培",
+            "543161": "程旭刚",
+            "543481": "韩明江",
+            "543454": "范天敏",
+            "543121": "杨富城",
+            "543340": "王淞禾",
+            "543311": "雷芯",
+            "543194": "杨龙彪",
+            "543507": "邓阳",
+            "543550": "王世金",
+            "543594": "张智炜",
+            "543595": "余智铨",
+            "543488": "单琛",
+            "543528": "詹小宜",
+            "543300": "吴振宇",
+            "543240": "毛建杰",
+            "543219": "陈存",
+            "543225": "吴伟",
+            "543070": "文艺",
+            "543064": "唐强",
+            "543380": "黄杰群",
+            "543111": "黄小龙",
+            "543114": "蒲松",
+            "543483": "刘爱秋",
+            "543556": "王政",
+            "543489": "丁杨",
+            "543307": "黄河",
+            "543480": "曾丽洁",
+            "543040": "尹霖",
+            "543334": "陶其宇",
+            "543548": "吴娇龙",
+            "543308": "周秋宏",
+            "543506": "龚林",
+            "543441": "刘志强",
+            "543356": "缪宇",
+            "543336": "向杰",
+            "543346": "毛艺朝",
+            "543113": "宗杰",
+            "543256": "罗红升",
+            "543345": "李文川",
+            "543435": "杨潇",
+            "543028": "翁玉全",
+            "543446": "张朋",
+            "543362": "王萝兴",
+            "543015": "王盛果",
+            "543343": "王杰",
+            "543288": "曾建瑀",
+            "543395": "王万超",
+            "543371": "吴智波",
+            "543060": "田富权",
+            "543037": "邓涛贵",
+            "543287": "吴林峰",
+            "543182": "张良川",
+            "543525": "田炀",
+            "543540": "彭浪",
+            "543542": "杨睿鹏",
+            "543588": "陈先艺",
+            "543601": "蒲纪州",
+            "543318": "刘慧玲",
+            "543187": "杨洋",
+            "543220": "周瑜",
+            "543354": "党中华",
+            "543258": "高丰",
+            "543214": "王富华",
+            "543384": "李林蔚",
+            "543317": "曾道洪",
+            "543019": "陈良超",
+            "543020": "谢仁凤",
+            "543083": "周代勇",
+            "543526": "周德芹",
+            "543388": "罗瑾",
+            "543569": "黄旷颖",
+            "543427": "江露",
+            "543328": "毛泽权",
+            "543517": "谢权",
+            "543173": "胡承义",
+            "543482": "张学梅",
+            "543051": "龙林彬",
+            "543565": "陈值富",
+            "543076": "林凯",
+            "543177": "江敏",
+            "543327": "魏俊",
+            "543071": "蔡懋",
+            "543278": "陈南清",
+            "543321": "刘孝坤",
+            "543386": "刘刚",
+            "543364": "张大彬",
+            "543451": "熊利均",
+            "543290": "邱和川",
+            "543185": "黄洋",
+            "543142": "罗立竖",
+            "543365": "王梦平",
+            "543082": "吴俊杰",
+            "543193": "唐钰汶",
+            "543245": "廖茂材",
+            "543366": "曹松涛",
+            "543198": "雷小琴",
+            "543119": "梅禄洪",
+            "543058": "何龙",
+            "543375": "刘剑利",
+            "543091": "李铁柱",
+            "543452": "何洪德",
+            "543202": "万小倩",
+            "543084": "严增林",
+            "543189": "王志文",
+            "543303": "李威",
+            "543213": "杨龙",
+            "543208": "韩颜宏",
+            "543116": "江林",
+            "543393": "张逢琴",
+            "543257": "邓世民",
+            "543043": "魏刚",
+            "543503": "陈浩",
+            "543518": "马代伟",
+            "543589": "张冬",
+            "543613": "刘珂遥",
+            "543614": "叶馥榕",
+            "543615": "刘兴",
+            "543616": "牟妍璇",
+            "543617": "宗绿绿",
+            "543618": "卢世睿",
+            "543619": "唐绪峰",
+            "543620": "段然",
+            "543621": "曾绍权",
+            "543622": "黄润发",
+            "543623": "喻庆",
+            "543624": "李健涛",
+            "543625": "成章鸿",
+            "543626": "李彬",
+            "543627": "程新瑞",
+            "543628": "刘琪琛",
+            "543629": "郑超",
+            "543630": "陆顺",
+            "543631": "邓顺杰",
+            "543632": "徐志强",
+            "543633": "梁淯川",
+            "543634": "程杰",
+            "543635": "夏云昊"
+        };
+
+        const list2NameToNumber = {};
+        for (const [num, name] of Object.entries(list2NameMap)) {
+            list2NameToNumber[name] = num;
+        }
+
+        const list1Numbers = Object.keys(list1NameMap);
+        const list2Numbers = Object.keys(list2NameMap);
+
+        const hGroup = [
+            "106003","085823", "105972","049268","047738", "106536", "106062", "047916"
+        ];
+
+        const specialGroupRaw = [
             "085544", "048848", "048727", "046827", "047167", "106318", "047994", 
             "047509", "085389", "085409", "085977", "047163", "048046", "047032", 
             "047398", "085496", "085965", "085539", "049465", "047284", "085970", 
@@ -544,18 +1624,29 @@
             "543232", "543384", "543306", "543006", "543213"
         ];
 
-        const specialGroupForList1 = specialGroup.filter(item => data.list1.includes(item));
-        const specialGroupForList2 = specialGroup.filter(item => data.list2.includes(item));
 
-        function getTail(numStr) {
-            return numStr.charAt(numStr.length - 1);
+        const specialGroup = specialGroupRaw.map(item => {
+            if (/^\d+$/.test(item)) return item;
+            const number = list2NameToNumber[item];
+            if (!number) {
+                console.warn(`特定人员组中姓名 "${item}" 未在名单二中找到对应编号！`);
+                return item;
+            }
+            return number;
+        });
+
+        const specialGroupForList1 = specialGroup.filter(item => list1NameMap.hasOwnProperty(item));
+        const specialGroupForList2 = specialGroup.filter(item => list2NameMap.hasOwnProperty(item));
+
+        function removeBrackets(name) {
+            return name; 
         }
 
         const state = {
             isRolling: false,
             list1Count: 0,
             list2Count: 0,
-            selectedTailNumber: null, 
+            selectedTailNumber: null,
             list1Results: [],
             list2Results: [],
             rollingInterval: null,
@@ -567,103 +1658,133 @@
 
         function init() {
             generateCountOptions();
-            generateTailNumberSelector();  
+            generateTailNumberSelector();
             createTechBackground();
             bindEvents();
             updateSettingsDisplay();
             console.log("抽签系统初始化完成");
-            console.log("名单二数量:", data.list2.length);
-            console.log("特定人员组总数:", specialGroup.length);
-            console.log("特定人员组-名单一:", specialGroupForList1.length);
-            console.log("特定人员组-名单二:", specialGroupForList2.length);
+            console.log(`名单一数量：${list1Numbers.length}`);
+            console.log(`名单二数量：${list2Numbers.length}`);
+            console.log(`特定人员组 - 名单一：${specialGroupForList1.length}人`);
+            console.log(`特定人员组 - 名单二：${specialGroupForList2.length}人`);
         }
 
         function generateCountOptions() {
-            const sel1 = document.getElementById('list1Count');
-            const sel2 = document.getElementById('list2Count');
-            sel1.innerHTML = '<option value="0">请选择人数</option>';
-            sel2.innerHTML = '<option value="0">请选择人数</option>';
+            const list1Select = document.getElementById('list1Count');
+            const list2Select = document.getElementById('list2Count');
+            
+            list1Select.innerHTML = '<option value="0">请选择人数</option>';
+            list2Select.innerHTML = '<option value="0">请选择人数</option>';
+            
             for (let i = 5; i <= 30; i++) {
-                sel1.add(new Option(`抽取 ${i} 人`, i));
-                sel2.add(new Option(`抽取 ${i} 人`, i));
+                const option1 = document.createElement('option');
+                option1.value = i;
+                option1.textContent = `抽取 ${i} 人`;
+                list1Select.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = i;
+                option2.textContent = `抽取 ${i} 人`;
+                list2Select.appendChild(option2);
             }
         }
 
         function generateTailNumberSelector() {
             const selector = document.getElementById('tailNumberSelector');
             selector.innerHTML = '';
+            
             const unlimited = document.createElement('div');
             unlimited.className = 'tail-number selected';
             unlimited.textContent = '不限';
             unlimited.dataset.number = '';
-            unlimited.addEventListener('click', () => selectTailNumber(''));
+            unlimited.addEventListener('click', function() {
+                selectTailNumber('');
+            });
             selector.appendChild(unlimited);
+            
             for (let i = 0; i <= 9; i++) {
-                const el = document.createElement('div');
-                el.className = 'tail-number';
-                el.textContent = i;
-                el.dataset.number = i;
-                el.addEventListener('click', () => selectTailNumber(i));
-                selector.appendChild(el);
+                const numberElement = document.createElement('div');
+                numberElement.className = 'tail-number';
+                numberElement.textContent = i;
+                numberElement.dataset.number = i;
+                numberElement.addEventListener('click', function() {
+                    selectTailNumber(i);
+                });
+                selector.appendChild(numberElement);
             }
         }
 
         function selectTailNumber(number) {
-            state.selectedTailNumber = number === '' ? null : number.toString();
-            document.querySelectorAll('.tail-number').forEach(el => {
+            state.selectedTailNumber = number === '' ? null : number;
+            
+            const allNumbers = document.querySelectorAll('.tail-number');
+            allNumbers.forEach(el => {
                 el.classList.remove('selected');
                 if ((number === '' && el.dataset.number === '') || 
                     (number !== '' && el.dataset.number === number.toString())) {
                     el.classList.add('selected');
                 }
             });
-            document.getElementById('tailFilterInfo').innerHTML = 
-                `当前: ${state.selectedTailNumber === null ? '不限' : '尾号 ' + state.selectedTailNumber}`;
+            
+            const tailNote = document.getElementById('tailNote');
+            if (state.selectedTailNumber !== null) {
+                tailNote.textContent = `当前筛选尾号：${state.selectedTailNumber}`;
+            }             
             updateSettingsDisplay();
         }
 
         function createTechBackground() {
-            const bg = document.getElementById('techBg');
+            const techBg = document.getElementById('techBg');
             for (let i = 0; i < 20; i++) {
-                bg.appendChild(createDiv('grid-line horizontal', { top: i * 5 + '%' }));
-                bg.appendChild(createDiv('grid-line vertical', { left: i * 5 + '%' }));
+                const horizontalLine = document.createElement('div');
+                horizontalLine.className = 'grid-line horizontal';
+                horizontalLine.style.top = `${(i * 5)}%`;
+                techBg.appendChild(horizontalLine);
+                
+                const verticalLine = document.createElement('div');
+                verticalLine.className = 'grid-line vertical';
+                verticalLine.style.left = `${(i * 5)}%`;
+                techBg.appendChild(verticalLine);
             }
+            
             for (let i = 0; i < 50; i++) {
-                bg.appendChild(createDiv('glowing-dots', {
-                    left: Math.random() * 100 + '%',
-                    top: Math.random() * 100 + '%',
-                    animationDelay: Math.random() * 3 + 's',
-                    animationDuration: 2 + Math.random() * 3 + 's'
-                }));
+                const dot = document.createElement('div');
+                dot.className = 'glowing-dots';
+                dot.style.left = `${Math.random() * 100}%`;
+                dot.style.top = `${Math.random() * 100}%`;
+                dot.style.animationDelay = `${Math.random() * 3}s`;
+                dot.style.animationDuration = `${2 + Math.random() * 3}s`;
+                techBg.appendChild(dot);
             }
-        }
-        function createDiv(className, styles) {
-            const d = document.createElement('div');
-            d.className = className;
-            Object.assign(d.style, styles);
-            return d;
         }
 
         function bindEvents() {
-            document.getElementById('list1Count').addEventListener('change', function(e) {
-                state.list1Count = parseInt(e.target.value) || 0;
+            document.getElementById('list1Count').addEventListener('change', function() {
+                state.list1Count = parseInt(this.value);
                 updateSettingsDisplay();
             });
-            document.getElementById('list2Count').addEventListener('change', function(e) {
-                state.list2Count = parseInt(e.target.value) || 0;
+            
+            document.getElementById('list2Count').addEventListener('change', function() {
+                state.list2Count = parseInt(this.value);
                 updateSettingsDisplay();
             });
+            
             document.getElementById('startBtn').addEventListener('click', startRolling);
             document.getElementById('stopBtn').addEventListener('click', stopRolling);
             document.getElementById('resetBtn').addEventListener('click', resetAll);
+            
             document.getElementById('stopBtn').disabled = true;
         }
 
         function updateSettingsDisplay() {
-            document.getElementById('list1Settings').innerHTML = 
-                `抽取人数: ${state.list1Count > 0 ? state.list1Count : '未选择'}`;
-            document.getElementById('list2Settings').innerHTML = 
-                `抽取人数: ${state.list2Count > 0 ? state.list2Count : '未选择'}`;
+            const list1Settings = document.getElementById('list1Settings');
+            const list2Settings = document.getElementById('list2Settings');
+            
+            let list1Text = `抽取人数: ${state.list1Count > 0 ? state.list1Count : '未选择'}`;
+            list1Settings.textContent = list1Text;
+            
+            let list2Text = `抽取人数: ${state.list2Count > 0 ? state.list2Count : '未选择'}`;
+            list2Settings.textContent = list2Text;
         }
 
         function startRolling() {
@@ -671,267 +1792,417 @@
                 alert('请至少为一个名单设置抽取人数！');
                 return;
             }
-            if ((state.list1Count > 0 && (state.list1Count < 5 || state.list1Count > 30)) ||
-                (state.list2Count > 0 && (state.list2Count < 5 || state.list2Count > 30))) {
-                alert('抽取人数必须在5-30人之间！');
+            
+            if (state.list1Count > 0 && (state.list1Count < 5 || state.list1Count > 30)) {
+                alert('名单一抽取人数必须在5-30人之间！');
                 return;
             }
-
+            
+            if (state.list2Count > 0 && (state.list2Count < 5 || state.list2Count > 30)) {
+                alert('名单二抽取人数必须在5-30人之间！');
+                return;
+            }
+            
             resetResults();
+            
             state.isRolling = true;
             state.processLog = [];
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
+            
+            const totalCount = state.list1Count + state.list2Count;
+            state.processLog.push(`总抽取人数: ${totalCount}人`);
+            
+            const specialCount = Math.floor(totalCount / 5);
+            state.processLog.push(`需要抽取的特定人员数量: ${specialCount}人`);
+            
 
-            const total = state.list1Count + state.list2Count;
-            const specialNeed = Math.floor(total / 5);
-            state.processLog.push(`总抽签人数: ${total}, 需要特定人员: ${specialNeed}`);
+            const specialResults = drawSpecialGroup(specialCount);
+            state.processLog.push(`实际抽取的特定人员: ${specialResults.length}人`);
+            
+            const specialResultsForList1 = specialResults.filter(item => list1NameMap.hasOwnProperty(item));
+            const specialResultsForList2 = specialResults.filter(item => list2NameMap.hasOwnProperty(item));
+            
+            state.processLog.push(`名单一特定人员: ${specialResultsForList1.length}人`);
+            state.processLog.push(`名单二特定人员: ${specialResultsForList2.length}人`);
+            
+            let list1Pool = [...list1Numbers];
+            let list2Pool = [...list2Numbers];
+            
+            list1Pool = list1Pool.filter(item => !specialGroupForList1.includes(item));
+            list2Pool = list2Pool.filter(item => !specialGroupForList2.includes(item));
+            
+            state.processLog.push(`剔除特定人员后名单一剩余: ${list1Pool.length}人`);
+            state.processLog.push(`剔除特定人员后名单二剩余: ${list2Pool.length}人`);
+            
+            let list1Remaining = state.list1Count - specialResultsForList1.length;
+            let list2Remaining = state.list2Count - specialResultsForList2.length;
+            
+            state.processLog.push(`名单一还需抽取: ${list1Remaining}人`);
+            state.processLog.push(`名单二还需抽取: ${list2Remaining}人`);
+            
 
-            const specialResults = drawSpecialGroup(specialNeed);
-            state.processLog.push(`实际抽取特定人员: ${specialResults.length} 人`);
-
-            const specialForList1 = specialResults.filter(item => data.list1.includes(item));
-            const specialForList2 = specialResults.filter(item => data.list2.includes(item));
-            state.processLog.push(`名单一特定: ${specialForList1.length}, 名单二特定: ${specialForList2.length}`);
-
-            let list1Pool = data.list1.filter(item => !specialGroupForList1.includes(item));
-            let list2Pool = data.list2.filter(item => !specialGroupForList2.includes(item));
-
-            if (state.selectedTailNumber !== null) {
-                list1Pool = list1Pool.filter(item => item.endsWith(state.selectedTailNumber));
-                list2Pool = list2Pool.filter(item => item.endsWith(state.selectedTailNumber));
+            let list1RegularResults = [];
+            if (list1Remaining > 0) {
+                list1RegularResults = drawList1Regular(list1Remaining, list1Pool);
+                state.processLog.push(`名单一普通人员抽取: ${list1RegularResults.length}人`);
             }
-
-            let list1Remain = state.list1Count - specialForList1.length;
-            let list2Remain = state.list2Count - specialForList2.length;
-
-            let list1Regular = list1Remain > 0 ? drawList1Regular(list1Remain, list1Pool) : [];
-            let list2Regular = list2Remain > 0 ? drawList2Regular(list2Remain, list2Pool) : [];
-
-            state.list1Results = [...specialForList1, ...list1Regular];
-            state.list2Results = [...specialForList2, ...list2Regular];
-
-            state.processLog.push(`名单一最终: ${state.list1Results.length}, 名单二最终: ${state.list2Results.length}`);
-            console.log(state.processLog.join('\n'));
-
+            
+            let list2RegularResults = [];
+            if (list2Remaining > 0) {
+                list2RegularResults = drawList2Regular(list2Remaining, list2Pool);
+                state.processLog.push(`名单二普通人员抽取: ${list2RegularResults.length}人`);
+            }
+            
+            state.list1Results = [...specialResultsForList1, ...list1RegularResults];
+            state.list2Results = [...specialResultsForList2, ...list2RegularResults];
+            
+            state.processLog.push(`名单一最终结果: ${state.list1Results.length}人`);
+            state.processLog.push(`名单二最终结果: ${state.list2Results.length}人`);
+            
+            console.log("=== 抽取过程日志 ===");
+            state.processLog.forEach(log => console.log(log));
+            
             prepareRollingDisplay();
             startRollingAnimation();
         }
 
-        function drawSpecialGroup(needCount) {
-            if (needCount <= 0) return [];
-
-            let needList1 = 0, needList2 = 0;
-            const both = state.list1Count > 0 && state.list2Count > 0;
-            const total = state.list1Count + state.list2Count;
-
-            if (both && total >= 10) {
-                needList1 = 1;
-                needList2 = 1;
-                let remaining = needCount - 2;
-                for (let i = 0; i < remaining; i++) {
-                    if (Math.random() < 0.5) needList1++; else needList2++;
+        function drawSpecialGroup(count) {
+            if (count <= 0) return [];
+            
+            const totalCount = state.list1Count + state.list2Count;
+            const bothListsSelected = state.list1Count > 0 && state.list2Count > 0;
+            
+            let needFromList1 = 0;
+            let needFromList2 = 0;
+            
+            if (bothListsSelected && totalCount >= 10) {
+                needFromList1 = 1;
+                needFromList2 = 1;
+                const remaining = count - 2;
+                if (remaining > 0) {
+                    for (let i = 0; i < remaining; i++) {
+                        if (Math.random() < 0.5) {
+                            needFromList1++;
+                        } else {
+                            needFromList2++;
+                        }
+                    }
                 }
             } else if (state.list1Count > 0 && state.list2Count === 0) {
-                needList1 = needCount;
+                needFromList1 = count;
             } else if (state.list2Count > 0 && state.list1Count === 0) {
-                needList2 = needCount;
+                needFromList2 = count;
             } else {
-                const r1 = state.list1Count / total;
-                needList1 = Math.round(needCount * r1);
-                needList2 = needCount - needList1;
+                const list1Ratio = state.list1Count / totalCount;
+                needFromList1 = Math.round(count * list1Ratio);
+                needFromList2 = count - needFromList1;
             }
-
-            needList1 = Math.min(needList1, specialGroupForList1.length);
-            needList2 = Math.min(needList2, specialGroupForList2.length);
-            if (needList1 + needList2 < needCount) {
-                const short = needCount - (needList1 + needList2);
-                if (specialGroupForList1.length > needList1) {
-                    needList1 += Math.min(short, specialGroupForList1.length - needList1);
+            
+            needFromList1 = Math.min(needFromList1, specialGroupForList1.length);
+            needFromList2 = Math.min(needFromList2, specialGroupForList2.length);
+            
+            if (needFromList1 + needFromList2 < count) {
+                const shortfall = count - (needFromList1 + needFromList2);
+                if (specialGroupForList1.length > needFromList1) {
+                    needFromList1 += Math.min(shortfall, specialGroupForList1.length - needFromList1);
                 }
-                if (needList1 + needList2 < needCount && specialGroupForList2.length > needList2) {
-                    needList2 += Math.min(needCount - (needList1 + needList2), specialGroupForList2.length - needList2);
+                const remainingShortfall = count - (needFromList1 + needFromList2);
+                if (remainingShortfall > 0 && specialGroupForList2.length > needFromList2) {
+                    needFromList2 += Math.min(remainingShortfall, specialGroupForList2.length - needFromList2);
                 }
             }
-
-            const list1SpecialDrawn = drawSpecialFromPool(specialGroupForList1, needList1);
-            const list2SpecialDrawn = drawSpecialFromPool(specialGroupForList2, needList2);
-
-            return [...list1SpecialDrawn, ...list2SpecialDrawn];
+            
+            const list1SpecialResults = drawSpecialGroupFromList(specialGroupForList1, needFromList1);
+            const list2SpecialResults = drawSpecialGroupFromList(specialGroupForList2, needFromList2);
+            
+            return [...list1SpecialResults, ...list2SpecialResults];
         }
 
-        function drawSpecialFromPool(pool, count) {
-            if (count <= 0 || pool.length === 0) return [];
+        function drawSpecialGroupFromList(pool, count) {
+            if (count <= 0) return [];
+            
             let available = [...pool];
-            const result = [];
-
+            let results = [];
+            
             if (state.selectedTailNumber !== null) {
-                const tailMatched = available.filter(item => item.endsWith(state.selectedTailNumber));
-                const tailMatchedCount = Math.min(count, tailMatched.length);
-                for (let i = 0; i < tailMatchedCount; i++) {
-                    const randIdx = Math.floor(Math.random() * tailMatched.length);
-                    result.push(tailMatched[randIdx]);
-                    const idxInAvailable = available.indexOf(tailMatched[randIdx]);
-                    if (idxInAvailable !== -1) available.splice(idxInAvailable, 1);
-                    tailMatched.splice(randIdx, 1);
+                const tail = state.selectedTailNumber.toString();
+                const eligible = available.filter(item => item.endsWith(tail));
+                const ineligible = available.filter(item => !item.endsWith(tail));
+                
+                const eligibleCount = Math.min(count, eligible.length);
+                for (let i = 0; i < eligibleCount; i++) {
+                    const randomIndex = Math.floor(Math.random() * eligible.length);
+                    results.push(eligible[randomIndex]);
+                    eligible.splice(randomIndex, 1);
+                }
+                
+                const remaining = count - eligibleCount;
+                for (let i = 0; i < remaining; i++) {
+                    const randomIndex = Math.floor(Math.random() * ineligible.length);
+                    results.push(ineligible[randomIndex]);
+                    ineligible.splice(randomIndex, 1);
+                }
+            } else {
+                for (let i = 0; i < count; i++) {
+                    const randomIndex = Math.floor(Math.random() * available.length);
+                    results.push(available[randomIndex]);
+                    available.splice(randomIndex, 1);
                 }
             }
-
-            if (result.length < count) {
-                const remainNeed = count - result.length;
-                const additional = drawRandomFromArray(available, remainNeed);
-                result.push(...additional);
-            }
-            return result;
-        }
-
-        function drawRandomFromArray(arr, n) {
-            if (n <= 0 || arr.length === 0) return [];
-            const copy = [...arr];
-            const res = [];
-            const take = Math.min(n, copy.length);
-            for (let i = 0; i < take; i++) {
-                const idx = Math.floor(Math.random() * copy.length);
-                res.push(copy[idx]);
-                copy.splice(idx, 1);
-            }
-            return res;
+            
+            return results;
         }
 
         function drawList1Regular(count, pool) {
-            if (count <= 0 || pool.length === 0) return [];
-            let weighted = [];
-            if (state.hGroupEnabled) {
-                const high = pool.filter(item => data.hGroup.includes(item));
-                const other = pool.filter(item => !data.hGroup.includes(item));
-                weighted = [...other];
-                high.forEach(item => { weighted.push(item, item, item); });
-            } else {
-                weighted = [...pool];
+            if (count <= 0) return [];
+            
+            let availableList = [...pool];
+            if (state.selectedTailNumber !== null) {
+                availableList = availableList.filter(item => 
+                    item.endsWith(state.selectedTailNumber.toString())
+                );
             }
-            return drawRandomFromArray(weighted, count);
+            
+            let weightedList = [];
+            if (state.hGroupEnabled) {
+                const highProbItems = availableList.filter(item => hGroup.includes(item));
+                const otherItems = availableList.filter(item => !hGroup.includes(item));
+                
+                weightedList = [...otherItems];
+                highProbItems.forEach(item => {
+                    weightedList.push(item);
+                    weightedList.push(item);
+                    weightedList.push(item);
+                });
+            } else {
+                weightedList = [...availableList];
+            }
+            
+            return drawFromArray(weightedList, count);
         }
 
         function drawList2Regular(count, pool) {
-            return drawRandomFromArray(pool, count);
+            if (count <= 0) return [];
+            
+            let availableList = [...pool];
+            if (state.selectedTailNumber !== null) {
+                availableList = availableList.filter(item => 
+                    item.endsWith(state.selectedTailNumber.toString())
+                );
+            }
+            
+            return drawFromArray(availableList, count);
+        }
+
+        function drawFromArray(array, count) {
+            if (count <= 0) return [];
+            const pool = [...array];
+            const results = [];
+            const actualCount = Math.min(count, pool.length);
+            for (let i = 0; i < actualCount; i++) {
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                results.push(pool[randomIndex]);
+                pool.splice(randomIndex, 1);
+            }
+            return results;
         }
 
         function prepareRollingDisplay() {
-            const area = document.getElementById('rollingArea');
-            area.innerHTML = '';
+            const rollingArea = document.getElementById('rollingArea');
+            rollingArea.innerHTML = '';
+            
             const totalSlots = state.list1Results.length + state.list2Results.length;
+            
             if (totalSlots === 0) {
-                area.innerHTML = '<div class="name-slot">无抽签结果</div>';
+                const slot = document.createElement('div');
+                slot.className = 'name-slot';
+                slot.textContent = '无抽签结果';
+                rollingArea.appendChild(slot);
                 return;
             }
+            
             for (let i = 0; i < totalSlots; i++) {
                 const slot = document.createElement('div');
                 slot.className = 'name-slot rolling';
                 slot.id = `slot-${i}`;
-                if (i < state.list1Results.length) slot.classList.add('list1');
-                else slot.classList.add('list2');
-                const idx = i < state.list1Results.length ? i : i - state.list1Results.length;
-                const list = i < state.list1Results.length ? state.list1Results : state.list2Results;
-                if (specialGroup.includes(list[idx])) slot.classList.add('special');
-                area.appendChild(slot);
+                
+                if (i < state.list1Results.length) {
+                    slot.classList.add('list1');
+                } else {
+                    slot.classList.add('list2');
+                }
+                
+                const resultIndex = i < state.list1Results.length ? i : i - state.list1Results.length;
+                const resultList = i < state.list1Results.length ? state.list1Results : state.list2Results;
+                const resultItem = resultList[resultIndex];
+                
+                if (specialGroup.includes(resultItem)) {
+                    slot.classList.add('special');
+                }
+                
+                rollingArea.appendChild(slot);
             }
         }
 
         function startRollingAnimation() {
             state.rollSpeed = 50;
             clearInterval(state.rollingInterval);
-            state.rollingInterval = setInterval(updateRollingDisplay, state.rollSpeed);
+            
+            state.rollingInterval = setInterval(() => {
+                updateRollingDisplay();
+            }, state.rollSpeed);
         }
 
         function updateRollingDisplay() {
             const totalSlots = state.list1Results.length + state.list2Results.length;
+            
             for (let i = 0; i < totalSlots; i++) {
                 const slot = document.getElementById(`slot-${i}`);
                 if (!slot) continue;
+                
                 const isList1 = i < state.list1Results.length;
-                const source = isList1 ? data.list1 : data.list2;
-                let randomName;
-                if (isList1 && state.selectedTailNumber !== null) {
-                    const filtered = data.list1.filter(item => item.endsWith(state.selectedTailNumber));
-                    if (filtered.length) randomName = filtered[Math.floor(Math.random() * filtered.length)];
-                    else randomName = data.list1[Math.floor(Math.random() * data.list1.length)];
+                const resultList = isList1 ? list1Numbers : list2Numbers;
+                
+                let randomNumber;
+                if (state.selectedTailNumber !== null) {
+                    const filteredList = resultList.filter(item => 
+                        item.endsWith(state.selectedTailNumber.toString())
+                    );
+                    if (filteredList.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * filteredList.length);
+                        randomNumber = filteredList[randomIndex];
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * resultList.length);
+                        randomNumber = resultList[randomIndex];
+                    }
                 } else {
-                    randomName = source[Math.floor(Math.random() * source.length)];
+                    const randomIndex = Math.floor(Math.random() * resultList.length);
+                    randomNumber = resultList[randomIndex];
                 }
-                slot.textContent = randomName;
+                
+                slot.textContent = randomNumber;
             }
         }
 
         function stopRolling() {
             if (!state.isRolling) return;
+            
             state.isRolling = false;
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
+            
             const slowDown = () => {
                 state.rollSpeed += 10;
+                
                 if (state.rollSpeed >= 200) {
                     clearInterval(state.rollingInterval);
                     showFinalResults();
                     return;
                 }
+                
                 clearInterval(state.rollingInterval);
-                state.rollingInterval = setInterval(updateRollingDisplay, state.rollSpeed);
+                state.rollingInterval = setInterval(() => {
+                    updateRollingDisplay();
+                }, state.rollSpeed);
+                
                 setTimeout(slowDown, 100);
             };
+            
             slowDown();
         }
 
         function showFinalResults() {
             const totalSlots = state.list1Results.length + state.list2Results.length;
+            
             for (let i = 0; i < totalSlots; i++) {
                 const slot = document.getElementById(`slot-${i}`);
                 if (!slot) continue;
+                
                 slot.classList.remove('rolling');
+                
                 const isList1 = i < state.list1Results.length;
-                slot.textContent = isList1 ? state.list1Results[i] : state.list2Results[i - state.list1Results.length];
+                const finalNumber = isList1 ? 
+                    state.list1Results[i] : 
+                    state.list2Results[i - state.list1Results.length];
+                
+                slot.textContent = finalNumber;
             }
+            
             updateResultDisplay();
         }
 
-function updateResultDisplay() {
-            const r1 = document.getElementById('list1Result');
-            r1.innerHTML = '';
+        function updateResultDisplay() {
+            const list1ResultArea = document.getElementById('list1Result');
+            list1ResultArea.innerHTML = '';
+            
             if (state.list1Results.length === 0) {
-                r1.innerHTML = '<div class="result-item list1">未抽取名单一</div>';
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'result-item list1';
+                emptyItem.textContent = '未抽取名单一';
+                list1ResultArea.appendChild(emptyItem);
             } else {
-                let spCnt = 0, hpCnt = 0;
-                state.list1Results.forEach((item, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'result-item list1';
-                    if (specialGroup.includes(item)) { div.classList.add('special'); spCnt++; }
-                    div.textContent = `${idx+1}. ${item}`;
-                    r1.appendChild(div);
+                let specialCount = 0;
+                let highProbCount = 0;
+                
+                state.list1Results.forEach((number, index) => {
+                    const name = list1NameMap[number] || number; 
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item list1';
+                    
+                    if (specialGroup.includes(number)) {
+                        resultItem.classList.add('special');
+                        resultItem.title = '特定人员组成员';
+                        specialCount++;
+                    }
+                    
+                    resultItem.textContent = `${index + 1}. ${name}`;
+                    list1ResultArea.appendChild(resultItem);
                 });
-         }
-
-            const r2 = document.getElementById('list2Result');
-            r2.innerHTML = '';
+                               
+            }
+            
+            const list2ResultArea = document.getElementById('list2Result');
+            list2ResultArea.innerHTML = '';
+            
             if (state.list2Results.length === 0) {
-                r2.innerHTML = '<div class="result-item list2">未抽取名单二</div>';
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'result-item list2';
+                emptyItem.textContent = '未抽取名单二';
+                list2ResultArea.appendChild(emptyItem);
             } else {
-                let spCnt = 0;
-                state.list2Results.forEach((item, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'result-item list2';
-                    if (specialGroup.includes(item)) { div.classList.add('special'); spCnt++; }
-                    div.textContent = `${idx+1}. ${item}`;
-                    r2.appendChild(div);
+                let specialCount = 0;
+                
+                state.list2Results.forEach((number, index) => {
+                    const name = list2NameMap[number] || number;
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item list2';
+                    
+                    if (specialGroup.includes(number)) {
+                        resultItem.classList.add('special');
+                        resultItem.title = '特定人员组成员';
+                        specialCount++;
+                    }
+                    
+                    resultItem.textContent = `${index + 1}. ${name}`;
+                    list2ResultArea.appendChild(resultItem);
                 });
+                               
             }
         }
-
 
         function resetResults() {
             state.list1Results = [];
             state.list2Results = [];
-            document.getElementById('rollingArea').innerHTML = '<div class="name-slot">准备开始抽签...</div>';
-            document.getElementById('list1Result').innerHTML = '<div class="result-item list1">等待抽签结果...</div>';
-            document.getElementById('list2Result').innerHTML = '<div class="result-item list2">等待抽签结果...</div>';
+            
+            const rollingArea = document.getElementById('rollingArea');
+            rollingArea.innerHTML = '<div class="name-slot">准备开始抽签...</div>';
+            
+            const list1ResultArea = document.getElementById('list1Result');
+            list1ResultArea.innerHTML = '<div class="result-item list1">等待抽签结果...</div>';
+            
+            const list2ResultArea = document.getElementById('list2Result');
+            list2ResultArea.innerHTML = '<div class="result-item list2">等待抽签结果...</div>';
         }
 
         function resetAll() {
@@ -939,22 +2210,35 @@ function updateResultDisplay() {
                 clearInterval(state.rollingInterval);
                 state.isRolling = false;
             }
+            
             state.list1Count = 0;
             state.list2Count = 0;
-            selectTailNumber('');
+            state.selectedTailNumber = null;
             state.list1Results = [];
             state.list2Results = [];
-            document.getElementById('list1Count').value = '0';
-            document.getElementById('list2Count').value = '0';
+            state.processLog = [];
+            
+            document.getElementById('list1Count').value = 0;
+            document.getElementById('list2Count').value = 0;
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
+            
+            const allNumbers = document.querySelectorAll('.tail-number');
+            allNumbers.forEach(el => {
+                el.classList.remove('selected');
+                if (el.dataset.number === '') {
+                    el.classList.add('selected');
+                }
+            });
+            document.getElementById('tailNote').textContent = '当前未选择尾号，不进行筛选';
+            
             resetResults();
             updateSettingsDisplay();
+            
             console.log("系统已重置");
         }
 
-        window.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
-
